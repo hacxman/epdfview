@@ -380,8 +380,8 @@ PrintPter::getPrinterAttributes (const gchar *printerName)
 
     ipp_t *request = ippNew ();
 
-    request->request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
-    request->request.op.request_id = 1;
+    ippSetOperation(request, IPP_GET_PRINTER_ATTRIBUTES);
+    ippSetRequestId(request, 1);
 
     ippAddString (request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
                   "attributes-charset", NULL, "utf-8");
@@ -403,7 +403,7 @@ PrintPter::getPrinterAttributes (const gchar *printerName)
             ippFindAttribute (answer, "printer-state", IPP_TAG_ZERO);
         if ( NULL != state )
         {
-            switch (state->values[0].integer)
+            switch (ippGetInteger(state, 0))
             {
                 case IPP_PRINTER_IDLE:
                     attributes->state = g_strdup (_("Idle"));
@@ -425,7 +425,7 @@ PrintPter::getPrinterAttributes (const gchar *printerName)
             ippFindAttribute (answer, "printer-location", IPP_TAG_ZERO);
         if ( NULL != location )
         {
-            attributes->location = g_strdup (location->values[0].string.text);
+            attributes->location = g_strdup (ippGetString(location, 0, NULL));
         }
 
         ippDelete (answer);
